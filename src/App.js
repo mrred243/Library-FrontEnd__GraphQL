@@ -4,10 +4,10 @@ import Books from './components/Books';
 import NewBook from './components/NewBook';
 
 const App = () => {
-	const [page, setPage] = useState('books');
+	const [page, setPage] = useState('authors');
 	const [errorMessage, setErrorMessage] = useState(null);
 
-	const errNotify = message => {
+	const errNotify = (message) => {
 		setErrorMessage(message);
 		setTimeout(() => {
 			setErrorMessage(null);
@@ -21,13 +21,14 @@ const App = () => {
 				<button onClick={() => setPage('books')}>books</button>
 				<button onClick={() => setPage('add')}>add book</button>
 			</div>
-			<Notify errorMessage={errorMessage} />
 
-			<Authors show={page === 'authors'} />
+			<Authors show={page === 'authors'} errNotify={errNotify} />
 
 			<Books show={page === 'books'} />
 
 			<NewBook show={page === 'add'} errNotify={errNotify} />
+
+			<Notify errorMessage={errorMessage} />
 		</div>
 	);
 };
