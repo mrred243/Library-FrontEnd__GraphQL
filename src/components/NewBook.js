@@ -1,72 +1,88 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
+import { useMutation } from '@apollo/client';
 
-const NewBook = (props) => {
-  const [title, setTitle] = useState('')
-  const [author, setAuhtor] = useState('')
-  const [published, setPublished] = useState('')
-  const [genre, setGenre] = useState('')
-  const [genres, setGenres] = useState([])
+import { ALL_AUTHOR, ALL_BOOK, CREATE_BOOK } from '../queries';
 
-  if (!props.show) {
-    return null
-  }
+const NewBook = ({ show, errNotify }) => {
+	const [title, setTitle] = useState('');
+	const [author, setAuthor] = useState('');
+	const [published, setPublished] = useState('');
+	const [genre, setGenre] = useState('');
+	const [genres, setGenres] = useState([]);
 
-  const submit = async (event) => {
-    event.preventDefault()
-    
-    console.log('add book...')
+	const [createBook] = useMutation(CREATE_BOOK, {
+		refetchQueries: [{ query: ALL_BOOK }, { query: ALL_AUTHOR }],
+		onError: (error) => {
+			errNotify(error.graphQLErrors[0].message);
+		},
+	});
 
-    setTitle('')
-    setPublished('')
-    setAuhtor('')
-    setGenres([])
-    setGenre('')
-  }
+	if (!show) {
+		return null;
+	}
 
-  const addGenre = () => {
-    setGenres(genres.concat(genre))
-    setGenre('')
-  }
+	const submit = async (event) => {
+		event.preventDefault();
 
-  return (
-    <div>
-      <form onSubmit={submit}>
-        <div>
-          title
-          <input
-            value={title}
-            onChange={({ target }) => setTitle(target.value)}
-          />
-        </div>
-        <div>
-          author
-          <input
-            value={author}
-            onChange={({ target }) => setAuhtor(target.value)}
-          />
-        </div>
-        <div>
-          published
-          <input
-            type='number'
-            value={published}
-            onChange={({ target }) => setPublished(target.value)}
-          />
-        </div>
-        <div>
-          <input
-            value={genre}
-            onChange={({ target }) => setGenre(target.value)}
-          />
-          <button onClick={addGenre} type="button">add genre</button>
-        </div>
-        <div>
-          genres: {genres.join(' ')}
-        </div>
-        <button type='submit'>create book</button>
-      </form>
-    </div>
-  )
-}
+		createBook({ variables: { title, author, published, genres } });
 
-export default NewBook
+		console.log(title, published, author, genres);
+
+		setTitle('');
+		setPublished('');
+		setAuthor('');
+		setGenres([]);
+		setGenre('');
+	};
+
+	const addGenre = () => {
+		setGenres(genres.concat(genre));
+		setGenre('');
+	};
+
+	return (
+		<div>
+			<form onSubmit={submit}>
+				<div>
+					title
+					<input
+						type='text'
+						value={title}
+						onChange={({ target }) => setTitle(target.value)}
+					/>
+				</div>
+				<div>
+					author
+					<input
+						type='text'
+						value={author}
+						onChange={({ target }) => setAuthor(target.value)}
+					/>
+				</div>
+				<div>
+					published
+					<input
+						type='number'
+						value={published}
+						onChange={({ target }) =>
+							setPublished(Number(target.value))
+						}
+					/>
+				</div>
+				<div>
+					<input
+						value={genre}
+						onChange={({ target }) => setGenre(target.value)}
+					/>
+					<button onClick={addGenre} type='button'>
+						add genre
+					</button>
+				</div>
+				<div>genres: {genres.join(' ')}</div>
+				<button type='submit'>create book</button>
+			</form>
+		</div>
+	);
+};
+
+export default NewBook;
