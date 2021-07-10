@@ -26,8 +26,6 @@ const NewBook = ({ show, errNotify }) => {
 
 		createBook({ variables: { title, author, published, genres } });
 
-		console.log(title, published, author, genres);
-
 		setTitle('');
 		setPublished('');
 		setAuthor('');
